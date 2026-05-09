@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>صح أم خطأ؟ - لعبة السعادة</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Tajawal',sans-serif;min-height:100vh;background:linear-gradient(135deg,#667eea,#764ba2,#f093fb);display:flex;align-items:center;justify-content:center;padding:16px}
+.card{background:#fff;border-radius:28px;padding:2rem;max-width:540px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3);text-align:center}
+h1{font-size:2rem;font-weight:900;background:linear-gradient(90deg,#667eea,#f093fb);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:.3rem}
+input[type=text]{width:100%;padding:14px;font-size:1.1rem;font-family:'Tajawal',sans-serif;border:2.5px solid #ddd;border-radius:16px;outline:none;text-align:center;margin:10px 0 4px}
+input:focus{border-color:#667eea}
+.btn{display:inline-block;padding:13px 32px;font-size:1.15rem;font-weight:700;font-family:'Tajawal',sans-serif;border:none;border-radius:50px;cursor:pointer;transition:.2s;margin-top:10px}
+.btn-start{background:linear-gradient(90deg,#667eea,#764ba2);color:#fff;width:100%}
+.btn-start:hover{transform:translateY(-2px)}
+.score-bar{display:flex;justify-content:space-between;background:#f0f4ff;border-radius:14px;padding:10px 16px;margin-bottom:1rem;font-size:1rem;font-weight:700;color:#555}
+.prog-wrap{background:#eee;border-radius:20px;height:10px;margin-bottom:1rem}
+.prog-fill{background:linear-gradient(90deg,#667eea,#f093fb);height:10px;border-radius:20px;transition:width .5s}
+.q-num{font-size:.95rem;color:#999;margin-bottom:.4rem}
+.q-text{font-size:1.4rem;font-weight:700;color:#222;background:#f8f4ff;border-radius:18px;padding:1.4rem 1.2rem;margin:0 0 1.2rem;line-height:1.9;border-right:5px solid #764ba2;min-height:90px;display:flex;align-items:center;justify-content:center}
+.btns-row{display:flex;gap:14px;justify-content:center}
+.btn-tf{font-size:1.3rem;min-width:130px;padding:14px 20px;border-radius:20px;border:none;cursor:pointer;font-family:'Tajawal',sans-serif;font-weight:700;transition:.2s}
+.btn-true{background:linear-gradient(135deg,#11998e,#38ef7d);color:#fff;box-shadow:0 4px 16px rgba(56,239,125,.35)}
+.btn-false{background:linear-gradient(135deg,#f7971e,#ffd200);color:#333;box-shadow:0 4px 16px rgba(255,210,0,.35)}
+.btn-tf:hover{transform:scale(1.07)}
+.btn-tf:disabled{opacity:.5;cursor:not-allowed;transform:none}
+#cert-section{display:none}
+.cert{background:linear-gradient(135deg,#fffdf0,#fff);border:6px double #f7971e;border-radius:24px;padding:2rem 1.5rem}
+.cert-ribbon{background:linear-gradient(90deg,#667eea,#764ba2);color:#fff;font-size:1.5rem;font-weight:900;padding:10px 0;border-radius:12px;margin-bottom:1rem}
+.cert-deco{font-size:1.6rem;letter-spacing:5px;margin:.4rem 0}
+.cert-label{font-size:.95rem;color:#888;margin:.3rem 0}
+.cert-name{font-size:1.9rem;font-weight:900;color:#764ba2;margin:.4rem 0;padding-bottom:4px;border-bottom:3px dashed #f093fb;display:inline-block}
+.cert-body{font-size:.95rem;color:#666;line-height:1.9;margin:.5rem 0}
+.cert-score-wrap{background:linear-gradient(135deg,#e8fff0,#d0ffe8);border-radius:16px;padding:1rem;margin:.8rem 0;border:2px solid #38ef7d}
+.cert-score-big{font-size:3.5rem;font-weight:900;color:#11998e;line-height:1}
+.cert-score-label{font-size:1rem;color:#11998e;font-weight:700}
+.cert-grade{font-size:1.1rem;font-weight:700;padding:8px 20px;border-radius:50px;display:inline-block;margin:.5rem 0}
+.cert-stars{font-size:2rem;margin:.4rem 0;letter-spacing:4px}
+.cert-final{font-size:1rem;font-weight:700;color:#764ba2;background:#f8f4ff;border-radius:12px;padding:.7rem 1rem;margin:.7rem 0}
+.btn-dl{background:linear-gradient(90deg,#11998e,#38ef7d);color:#fff;margin-top:.8rem;padding:12px 28px;font-size:1rem;border:none;border-radius:50px;cursor:pointer;font-family:'Tajawal',sans-serif;font-weight:700;transition:.2s}
+.btn-dl:hover{transform:scale(1.05)}
+.cf-wrap{position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:9999;overflow:hidden}
+.cf{position:absolute;border-radius:3px;animation:fall linear forwards}
+@keyframes fall{0%{transform:translateY(-20px) rotate(0);opacity:1}100%{transform:translateY(110vh) rotate(720deg);opacity:0}}
+</style>
+</head>
+<body>
+<div class="card" id="main-card">
+
+  <div id="name-screen">
+    <div style="font-size:3rem;margin-bottom:.5rem">😊🌟</div>
+    <h1>صح أم خطأ؟</h1>
+    <p style="color:#888;margin-bottom:1rem">لعبة السعادة — الصف الخامس</p>
+    <label style="font-weight:700;color:#555">أدخل اسمك:</label>
+    <input type="text" id="player-name" placeholder="اكتب اسمك هنا...">
+    <button class="btn btn-start" onclick="startGame()">ابدأ اللعبة 🚀</button>
+  </div>
+
+  <div id="game-screen" style="display:none">
+    <div class="score-bar">
+      <span>🏆 الدرجة: <span id="score-disp" style="color:#667eea">0</span> / 10</span>
+      <span id="pname-disp" style="color:#764ba2;font-size:.95rem"></span>
+    </div>
+    <div class="prog-wrap"><div class="prog-fill" id="prog" style="width:0%"></div></div>
+    <div class="q-num" id="q-num"></div>
+    <div class="q-text" id="q-text"></div>
+    <div class="btns-row">
+      <button class="btn-tf btn-true" id="btn-t" onclick="answer(true)">✅ صح</button>
+      <button class="btn-tf btn-false" id="btn-f" onclick="answer(false)">❌ خطأ</button>
+    </div>
+  </div>
+
+  <div id="cert-section">
+    <div class="cert" id="cert-box">
+      <div class="cert-ribbon">شهادة تقدير 🎓</div>
+      <div class="cert-deco">🌟⭐✨🌟⭐✨🌟</div>
+      <div class="cert-label">نقدم هذه الشهادة للطالب المتميز</div>
+      <div class="cert-name" id="cert-name"></div>
+      <div class="cert-body">لإكماله لعبة السعادة بنجاح</div>
+      <div class="cert-score-wrap">
+        <div class="cert-score-big" id="cert-score"></div>
+        <div class="cert-score-label">من أصل 10 درجات</div>
+      </div>
+      <div class="cert-grade" id="cert-grade"></div>
+      <div class="cert-stars" id="cert-stars"></div>
+      <div class="cert-final">أنت شخص يعرف معنى السعادة! 💛</div>
+      <div class="cert-deco">🌈🌸🌻🌈🌸🌻🌈</div>
+      <button class="btn btn-dl" id="dl-btn" onclick="downloadCert()">⬇️ تنزيل الشهادة</button>
+    </div>
+  </div>
+
+</div>
+
+<div class="cf-wrap" id="cf-wrap"></div>
+
+<script>
+const Qs=[
+  {text:"السعادة تأتي من الأشياء الصعبة فقط.",ans:false},
+  {text:"من النصائح أن يعيش الإنسان ببساطة.",ans:true},
+  {text:"التشاؤم يجعل الإنسان سعيدًا.",ans:false},
+  {text:"تقديم المساعدة للآخرين يدخل السرور إلى القلب.",ans:true},
+  {text:"يجب أن نخاف من التغيير دائمًا.",ans:false}
+];
+const MARKS_EACH=2;
+let cur=0,score=0,name="",done=false;
+
+const AC=window.AudioContext||window.webkitAudioContext;
+let actx;
+function tone(f,d,t='sine',g=.4){try{if(!actx)actx=new AC();let o=actx.createOscillator(),gn=actx.createGain();o.connect(gn);gn.connect(actx.destination);o.type=t;o.frequency.value=f;gn.gain.setValueAtTime(g,actx.currentTime);gn.gain.exponentialRampToValueAtTime(.001,actx.currentTime+d);o.start();o.stop(actx.currentTime+d);}catch(e){}}
+function sndOK(){tone(523,.1);setTimeout(()=>tone(659,.1),110);setTimeout(()=>tone(784,.22),220);}
+function sndNo(){tone(280,.15,'sawtooth',.3);setTimeout(()=>tone(230,.25,'sawtooth',.3),160);}
+
+function startGame(){
+  name=document.getElementById('player-name').value.trim();
+  if(!name){alert('من فضلك أدخل اسمك!');return;}
+  document.getElementById('name-screen').style.display='none';
+  document.getElementById('game-screen').style.display='block';
+  document.getElementById('pname-disp').textContent='👤 '+name;
+  showQ();
+}
+
+function showQ(){
+  done=false;
+  document.getElementById('q-num').textContent=`السؤال ${cur+1} من ${Qs.length}`;
+  document.getElementById('prog').style.width=((cur/Qs.length)*100)+'%';
+  document.getElementById('q-text').textContent=Qs[cur].text;
+  document.getElementById('btn-t').disabled=false;
+  document.getElementById('btn-f').disabled=false;
+}
+
+function answer(val){
+  if(done)return;
+  done=true;
+  document.getElementById('btn-t').disabled=true;
+  document.getElementById('btn-f').disabled=true;
+
+  if(val===Qs[cur].ans){
+    score+=MARKS_EACH;
+    document.getElementById('score-disp').textContent=score;
+    sndOK(); confetti(20);
+  } else {
+    sndNo();
+  }
+
+  cur++;
+  if(cur<Qs.length){
+    setTimeout(()=>showQ(), 400);
+  } else {
+    setTimeout(()=>showCert(), 400);
+  }
+}
+
+function showCert(){
+  document.getElementById('game-screen').style.display='none';
+  document.getElementById('cert-section').style.display='block';
+  document.getElementById('cert-name').textContent=name;
+  document.getElementById('cert-score').textContent=score;
+  let pct=score/10,grade,col,stars;
+  if(pct===1){grade='ممتاز 🥇';col='#11998e';stars='⭐⭐⭐⭐⭐';}
+  else if(pct>=.8){grade='جيد جداً 🥈';col='#667eea';stars='⭐⭐⭐⭐';}
+  else if(pct>=.6){grade='جيد 🥉';col='#f7971e';stars='⭐⭐⭐';}
+  else{grade='يحتاج مراجعة 📖';col='#c0392b';stars='⭐⭐';}
+  let gEl=document.getElementById('cert-grade');
+  gEl.textContent=grade;
+  gEl.style.background=col+'22';
+  gEl.style.color=col;
+  gEl.style.border='2px solid '+col;
+  document.getElementById('cert-stars').textContent=stars;
+  confetti(120);setTimeout(()=>confetti(80),900);
+}
+
+function confetti(n){
+  let w=document.getElementById('cf-wrap');
+  let cols=['#667eea','#f093fb','#11998e','#ffd200','#f7971e','#38ef7d','#764ba2','#ff6b6b'];
+  for(let i=0;i<n;i++){
+    let d=document.createElement('div');
+    d.className='cf';
+    d.style.left=Math.random()*100+'vw';
+    d.style.background=cols[Math.floor(Math.random()*cols.length)];
+    d.style.width=(6+Math.random()*10)+'px';
+    d.style.height=(6+Math.random()*10)+'px';
+    d.style.borderRadius=Math.random()>.5?'50%':'3px';
+    d.style.animationDuration=(1.5+Math.random()*2.5)+'s';
+    d.style.animationDelay=(Math.random()*.7)+'s';
+    w.appendChild(d);
+    setTimeout(()=>d.remove(),4000);
+  }
+}
+
+async function downloadCert(){
+  const btn=document.getElementById('dl-btn');
+  btn.textContent='جاري التحضير...';
+  btn.disabled=true;
+  const el=document.getElementById('cert-box');
+  if(window.html2canvas){
+    html2canvas(el,{scale:2,backgroundColor:'#fffdf0',useCORS:true,logging:false}).then(c=>{
+      triggerDownload(c.toDataURL('image/png'));
+      btn.textContent='⬇️ تنزيل الشهادة';
+      btn.disabled=false;
+    }).catch(()=>fallbackDownload(btn));
+  } else {
+    fallbackDownload(btn);
+  }
+}
+
+function triggerDownload(dataUrl){
+  const a=document.createElement('a');
+  a.download='شهادة_'+name+'.png';
+  a.href=dataUrl;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+function fallbackDownload(btn){
+  const canvas=document.createElement('canvas');
+  canvas.width=700;canvas.height=560;
+  const ctx=canvas.getContext('2d');
+  const bg=ctx.createLinearGradient(0,0,700,560);
+  bg.addColorStop(0,'#fffdf0');bg.addColorStop(1,'#fff');
+  ctx.fillStyle=bg;ctx.fillRect(0,0,700,560);
+  ctx.strokeStyle='#f7971e';ctx.lineWidth=8;ctx.strokeRect(12,12,676,536);
+  ctx.strokeStyle='#f7971e';ctx.lineWidth=3;ctx.strokeRect(20,20,660,520);
+  const rib=ctx.createLinearGradient(0,0,700,0);
+  rib.addColorStop(0,'#667eea');rib.addColorStop(1,'#764ba2');
+  ctx.fillStyle=rib;roundRect(ctx,40,36,620,56,14);
+  ctx.fillStyle='#fff';ctx.font='bold 24px Arial';ctx.textAlign='center';
+  ctx.fillText('شهادة تقدير 🎓',350,74);
+  ctx.fillStyle='#888';ctx.font='18px Arial';ctx.fillText('نقدم هذه الشهادة للطالب المتميز',350,120);
+  ctx.fillStyle='#764ba2';ctx.font='bold 36px Arial';ctx.fillText(name,350,168);
+  ctx.fillStyle='#666';ctx.font='16px Arial';ctx.fillText('لإكماله لعبة السعادة بنجاح',350,200);
+  const sb=ctx.createLinearGradient(0,220,0,310);
+  sb.addColorStop(0,'#e8fff0');sb.addColorStop(1,'#d0ffe8');
+  ctx.fillStyle=sb;roundRect(ctx,200,220,300,100,16);
+  ctx.fillStyle='#11998e';ctx.font='bold 64px Arial';ctx.fillText(score,350,295);
+  ctx.font='16px Arial';ctx.fillText('من أصل 10 درجات',350,330);
+  let pct=score/10,grade,col;
+  if(pct===1){grade='ممتاز 🥇';col='#11998e';}
+  else if(pct>=.8){grade='جيد جداً 🥈';col='#667eea';}
+  else if(pct>=.6){grade='جيد 🥉';col='#f7971e';}
+  else{grade='يحتاج مراجعة 📖';col='#c0392b';}
+  ctx.fillStyle=col;ctx.font='bold 22px Arial';ctx.fillText(grade,350,375);
+  ctx.fillStyle='#764ba2';ctx.font='bold 16px Arial';ctx.fillText('أنت شخص يعرف معنى السعادة! 💛',350,430);
+  ctx.fillStyle='#999';ctx.font='13px Arial';ctx.fillText('🌈🌸🌻🌈🌸🌻🌈',350,470);
+  triggerDownload(canvas.toDataURL('image/png'));
+  btn.textContent='⬇️ تنزيل الشهادة';
+  btn.disabled=false;
+}
+
+function roundRect(ctx,x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);
+  ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+  ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);
+  ctx.closePath();ctx.fill();
+}
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</body>
+</html>
